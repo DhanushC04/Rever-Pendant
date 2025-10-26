@@ -1,0 +1,6 @@
+# Ignore Vosk model folder (large files)
+audio_module/vosk-model-en-us-0.22/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc

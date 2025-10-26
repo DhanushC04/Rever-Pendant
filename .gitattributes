@@ -1,0 +1,7 @@
+# Auto detect text files and normalize line endings to LF
+* text=auto
+
+# Explicit rules for code/config files
+*.py text eol=lf
+*.conf text eol=lf
+*.md text eol=lf
