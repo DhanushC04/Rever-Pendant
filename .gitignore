@@ -1,19 +1,23 @@
-# Ignore virtual environment
+# Virtual environment
 .venv/
 
-# Ignore large model files
+# Model folders
 audio_module/vosk-model-en-in-0.5/
 
-# Ignore any other models or checkpoints
+# Python cache files
+__pycache__/
+*.pyc
+
+# Large binaries / model weights
 *.mdl
 *.fst
 *.carpa
 *.pth
 *.pt
-*.onnx
-*.zip
+*.dll
+*.pyd
 
-# Ignore cache / build files
-__pycache__/
-*.pyc
+# Logs and temp files
 *.log
+*.tmp
+
