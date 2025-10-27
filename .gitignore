@@ -2,7 +2,7 @@
 .venv/
 
 # Model folders
-audio_module/vosk-model-en-in-0.5/
+backend/audio_module/vosk-model-en-in-0.5/
 
 # Python cache files
 __pycache__/
