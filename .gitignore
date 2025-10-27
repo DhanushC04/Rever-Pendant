@@ -1,32 +1,22 @@
-# Virtual environment
-.venv/
-
-# Model folders
-backend/audio_module/vosk-model-en-in-0.5/
-
-# Python cache files
+# Python
 __pycache__/
+.venv/
 *.pyc
 
-# Large binaries / model weights
-*.mdl
-*.fst
-*.carpa
-*.pth
-*.pt
-*.dll
-*.pyd
-
-# Logs and temp files
-*.log
-*.tmp
-
-# Node / React
-node_modules/
+# Node
+frontend/node_modules/
 dist/
 build/
 
-# OS / IDE files
+# Vosk large model files
+backend/audio_module/vosk-model-en-in-0.5/
+*.fst
+*.mdl
+*.carpa
+*.dll
+*.pyd
+
+# OS/IDE
 .DS_Store
 Thumbs.db
 .vscode/
