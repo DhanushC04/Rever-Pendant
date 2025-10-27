@@ -1,23 +1,16 @@
-# Python
-__pycache__/
+# Virtual env
 .venv/
-*.pyc
 
-# Node
-frontend/node_modules/
-dist/
-build/
-
-# Vosk large model files
+# Model files
 backend/audio_module/vosk-model-en-in-0.5/
-*.fst
-*.mdl
-*.carpa
+audio_module/vosk-model-en-in-0.5/
+
+# Binary / compiled
 *.dll
 *.pyd
-
-# OS/IDE
-.DS_Store
-Thumbs.db
-.vscode/
-.env
+*.mdl
+*.fst
+*.carpa
+*.dat
+*.bin
+__pycache__/
