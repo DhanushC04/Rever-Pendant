@@ -1,6 +1,0 @@
-opencv-contrib-python
-numpy
-vosk
-sounddevice
-transformers
-torch

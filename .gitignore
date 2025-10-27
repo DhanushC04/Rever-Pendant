@@ -21,3 +21,13 @@ __pycache__/
 *.log
 *.tmp
 
+# Node / React
+node_modules/
+dist/
+build/
+
+# OS / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.env
