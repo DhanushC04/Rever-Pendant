@@ -296,7 +296,7 @@ const Dashboard = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-purple-200/60 text-sm">
-          <p>AI Pendant System • Capstone Project</p>
+          <p>Rever : AI Pendant System • Capstone Project</p>
           <p className="mt-1">Powered by Vosk, OpenCV & Facebook BART</p>
         </div>
       </div>
