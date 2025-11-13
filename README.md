@@ -1,9 +1,9 @@
+download the vosk-model-en-us-0.22  
+.....
 
-download the vosk-model-en-us-0.22
-....
-Capstone/
-├─ audio_module/
-│  └─ vosk-model-en-us-0.22/  <-- place model here
-├─ main.py
-├─ face_module/
-└─ summary_module/
+Root/  
+├── audio_module/  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └─ vosk-model-en-us-0.22/  <-- place model here  
+├── main.py  
+├── face_module/  
+└── summary_module/    
