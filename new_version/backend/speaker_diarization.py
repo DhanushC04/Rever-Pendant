@@ -1,20 +1,20 @@
 """
-Complete Speaker Diarization with Pyannote.audio
-Supports multiple speakers with detailed analysis
+Complete Multi-Speaker Diarization with Pyannote.audio
+Updated for latest pyannote API (3.x)
+Cross-platform: Mac + Windows
 """
-
 import os
 import torch
 from models import get_db, Speaker, SpeakerSegment
 
-# Check if pyannote is available
+# Try to import pyannote
 try:
     from pyannote.audio import Pipeline
     PYANNOTE_AVAILABLE = True
     print("✅ Pyannote.audio loaded successfully")
 except ImportError:
     PYANNOTE_AVAILABLE = False
-    print("⚠️  Pyannote.audio not installed - using fallback mode")
+    print("ℹ️  Pyannote.audio not installed - using simple speaker detection")
 
 class SpeakerDiarizer:
     """
@@ -45,10 +45,19 @@ class SpeakerDiarizer:
                     return
                 
                 print("Loading pyannote pipeline...")
-                self.pipeline = Pipeline.from_pretrained(
-                    "pyannote/speaker-diarization-3.1",
-                    use_auth_token=token
-                )
+                
+                # Try new API first (pyannote 3.x+)
+                try:
+                    self.pipeline = Pipeline.from_pretrained(
+                        "pyannote/speaker-diarization-3.1",
+                        use_auth_token=token  # New API
+                    )
+                except TypeError:
+                    # Fallback to old API (pyannote 2.x)
+                    self.pipeline = Pipeline.from_pretrained(
+                        "pyannote/speaker-diarization",
+                        use_auth_token=token
+                    )
                 
                 # Use GPU if available
                 if torch.cuda.is_available():
@@ -100,44 +109,49 @@ class SpeakerDiarizer:
         """
         print(f"🎭 Analyzing speakers in: {os.path.basename(audio_path)}")
         
-        # Run diarization
-        diarization = self.pipeline(audio_path)
-        
-        # Process results
-        speakers_data = {}
-        segments = []
-        
-        for turn, _, speaker in diarization.itertracks(yield_label=True):
-            segment = {
-                'speaker': speaker,
-                'start': turn.start,
-                'end': turn.end,
-                'duration': turn.end - turn.start
-            }
-            segments.append(segment)
+        try:
+            # Run diarization
+            diarization = self.pipeline(audio_path)
             
-            # Accumulate speaker stats
-            if speaker not in speakers_data:
-                speakers_data[speaker] = {
-                    'label': speaker,
-                    'total_duration': 0,
-                    'segment_count': 0
+            # Process results
+            speakers_data = {}
+            segments = []
+            
+            for turn, _, speaker in diarization.itertracks(yield_label=True):
+                segment = {
+                    'speaker': speaker,
+                    'start': turn.start,
+                    'end': turn.end,
+                    'duration': turn.end - turn.start
                 }
+                segments.append(segment)
+                
+                # Accumulate speaker stats
+                if speaker not in speakers_data:
+                    speakers_data[speaker] = {
+                        'label': speaker,
+                        'total_duration': 0,
+                        'segment_count': 0
+                    }
+                
+                speakers_data[speaker]['total_duration'] += segment['duration']
+                speakers_data[speaker]['segment_count'] += 1
             
-            speakers_data[speaker]['total_duration'] += segment['duration']
-            speakers_data[speaker]['segment_count'] += 1
-        
-        result = {
-            'speakers': list(speakers_data.values()),
-            'segments': segments,
-            'speaker_count': len(speakers_data)
-        }
-        
-        print(f"✅ Found {result['speaker_count']} speaker(s)")
-        for speaker in result['speakers']:
-            print(f"   - {speaker['label']}: {speaker['total_duration']:.1f}s ({speaker['segment_count']} segments)")
-        
-        return result
+            result = {
+                'speakers': list(speakers_data.values()),
+                'segments': segments,
+                'speaker_count': len(speakers_data)
+            }
+            
+            print(f"✅ Found {result['speaker_count']} speaker(s)")
+            for speaker in result['speakers']:
+                print(f"   - {speaker['label']}: {speaker['total_duration']:.1f}s ({speaker['segment_count']} segments)")
+            
+            return result
+            
+        except Exception as e:
+            print(f"⚠️  Diarization error: {e}")
+            return self._fallback_diarization()
     
     def _fallback_diarization(self):
         """
@@ -177,7 +191,7 @@ class SpeakerDiarizer:
         diarization_result = self.diarize(audio_path)
         segments = diarization_result['segments']
         
-        if not word_timestamps:
+        if not word_timestamps or len(word_timestamps) == 0:
             # No word timestamps - assign all text to first speaker
             if segments:
                 return [{
