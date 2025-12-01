@@ -83,101 +83,146 @@ def add_log(message, log_type='info'):
 
 def send_keynote_email(user_email, conversation_title, keynotes):
     """Send email with keynote summary"""
-    try:
-        msg = Message(
-            subject=f"📋 Keynotes from: {conversation_title}",
-            recipients=[user_email]
-        )
-        
-        html_body = f"""
-        <html>
-        <body style="font-family: Arial; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #8b5cf6;">📋 Keynotes Summary</h1>
-                <h2>{conversation_title}</h2>
-                <p><strong>Generated:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M")}</p>
-                <hr>
-                <h3>Key Takeaways:</h3>
-        """
-        
-        for keynote in keynotes:
-            color = {
-                'action_item': '#ef4444',
-                'decision': '#10b981',
-                'question': '#f59e0b',
-                'deadline': '#dc2626'
-            }.get(keynote['category'], '#8b5cf6')
+    add_log(f"📧 [KEYNOTE EMAIL] Starting - Target: {user_email}", 'info')
+    
+    # Ensure Flask app context for Message object creation and mail.send()
+    with app.app_context():
+        try:
+            add_log(f"📧 [KEYNOTE EMAIL] Mail server config - Server: {app.config.get('MAIL_SERVER')}, Port: {app.config.get('MAIL_PORT')}", 'info')
+            add_log(f"📧 [KEYNOTE EMAIL] Sender: {app.config.get('MAIL_USERNAME')}", 'info')
             
-            html_body += f"""
-            <div style="background: #f3f4f6; padding: 15px; margin: 10px 0; border-left: 4px solid {color}; border-radius: 8px;">
-                <span style="background: {color}; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">
-                    {keynote['category'].replace('_', ' ').upper()}
-                </span>
-                <p>{keynote['content']}</p>
-                <p style="color: #6b7280; font-size: 12px;">Importance: {int(keynote['importance_score'] * 100)}%</p>
-            </div>
+            msg = Message(
+                subject=f"📋 Keynotes from: {conversation_title}",
+                recipients=[user_email]
+            )
+            add_log(f"📧 [KEYNOTE EMAIL] Message object created with {len(keynotes)} keynotes", 'info')
+            
+            html_body = f"""
+            <html>
+            <body style="font-family: Arial; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #8b5cf6;">📋 Keynotes Summary</h1>
+                    <h2>{conversation_title}</h2>
+                    <p><strong>Generated:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M")}</p>
+                    <hr>
+                    <h3>Key Takeaways:</h3>
             """
-        
-        html_body += """
-                <hr>
-                <p style="color: #6b7280; font-size: 12px;">
-                    AI Pendant System - Automated Keynotes
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-        
-        msg.html = html_body
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Email error: {e}")
-        return False
+            
+            for i, keynote in enumerate(keynotes):
+                add_log(f"📧 [KEYNOTE EMAIL] Processing keynote {i+1}: {keynote.get('category', 'unknown')}", 'info')
+                color = {
+                    'action_item': '#ef4444',
+                    'decision': '#10b981',
+                    'question': '#f59e0b',
+                    'deadline': '#dc2626'
+                }.get(keynote['category'], '#8b5cf6')
+                
+                html_body += f"""
+                <div style="background: #f3f4f6; padding: 15px; margin: 10px 0; border-left: 4px solid {color}; border-radius: 8px;">
+                    <span style="background: {color}; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;">
+                        {keynote['category'].replace('_', ' ').upper()}
+                    </span>
+                    <p>{keynote['content']}</p>
+                    <p style="color: #6b7280; font-size: 12px;">Importance: {int(keynote['importance_score'] * 100)}%</p>
+                </div>
+                """
+            
+            html_body += """
+                    <hr>
+                    <p style="color: #6b7280; font-size: 12px;">
+                        AI Pendant System - Automated Keynotes
+                    </p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            msg.html = html_body
+            add_log(f"📧 [KEYNOTE EMAIL] HTML body built, calling mail.send()", 'info')
+            
+            mail.send(msg)
+            add_log(f"✅ [KEYNOTE EMAIL] SUCCESS - Email sent to {user_email}", 'success')
+            return True
+        except Exception as e:
+            add_log(f"❌ [KEYNOTE EMAIL] FAILED - Error: {str(e)}", 'error')
+            import traceback
+            add_log(f"❌ [KEYNOTE EMAIL] Traceback: {traceback.format_exc()}", 'error')
+            return False
 
 def send_reminder_email(reminder_id):
     """Send scheduled reminder"""
-    db = get_db()
-    try:
-        reminder = db.query(Reminder).filter(Reminder.id == reminder_id).first()
-        if not reminder or reminder.is_sent:
-            return
-        
-        keynote = db.query(Keynote).filter(Keynote.id == reminder.keynote_id).first()
-        user = db.query(User).filter(User.id == reminder.user_id).first()
-        
-        if not keynote or not user:
-            return
-        
-        msg = Message(
-            subject=f"⏰ Reminder: {keynote.category.replace('_', ' ').title()}",
-            recipients=[user.email]
-        )
-        
-        msg.html = f"""
-        <html>
-        <body style="padding: 20px; font-family: Arial;">
-            <div style="max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #8b5cf6;">⏰ Reminder</h1>
-                <div style="background: #fef3c7; padding: 20px; border-left: 4px solid #f59e0b; border-radius: 8px;">
-                    <h3>{keynote.category.replace('_', ' ').title()}</h3>
-                    <p style="font-size: 16px;">{keynote.content}</p>
-                    <p style="color: #6b7280; font-size: 12px;">Importance: {int(keynote.importance_score * 100)}%</p>
+    add_log(f"⏰ [REMINDER EMAIL] Starting for reminder_id: {reminder_id}", 'info')
+    
+    # Scheduler jobs run outside request context — ensure app context
+    with app.app_context():
+        add_log(f"⏰ [REMINDER EMAIL] Inside app context, getting database", 'info')
+        db = get_db()
+        try:
+            add_log(f"⏰ [REMINDER EMAIL] Querying reminder with ID: {reminder_id}", 'info')
+            reminder = db.query(Reminder).filter(Reminder.id == reminder_id).first()
+            
+            if not reminder:
+                add_log(f"⏰ [REMINDER EMAIL] ERROR: Reminder {reminder_id} not found in database", 'error')
+                return
+            
+            if reminder.is_sent:
+                add_log(f"⏰ [REMINDER EMAIL] SKIP: Reminder {reminder_id} already sent at {reminder.sent_at}", 'info')
+                return
+            
+            add_log(f"⏰ [REMINDER EMAIL] Reminder found, querying keynote: {reminder.keynote_id}", 'info')
+            keynote = db.query(Keynote).filter(Keynote.id == reminder.keynote_id).first()
+            
+            add_log(f"⏰ [REMINDER EMAIL] Querying user: {reminder.user_id}", 'info')
+            user = db.query(User).filter(User.id == reminder.user_id).first()
+            
+            if not keynote:
+                add_log(f"⏰ [REMINDER EMAIL] ERROR: Keynote {reminder.keynote_id} not found", 'error')
+                return
+            
+            if not user:
+                add_log(f"⏰ [REMINDER EMAIL] ERROR: User {reminder.user_id} not found", 'error')
+                return
+            
+            add_log(f"⏰ [REMINDER EMAIL] Found keynote '{keynote.category}' for user '{user.email}'", 'info')
+            add_log(f"⏰ [REMINDER EMAIL] Mail config - Server: {app.config.get('MAIL_SERVER')}, Sender: {app.config.get('MAIL_USERNAME')}", 'info')
+            
+            msg = Message(
+                subject=f"⏰ Reminder: {keynote.category.replace('_', ' ').title()}",
+                recipients=[user.email]
+            )
+            add_log(f"⏰ [REMINDER EMAIL] Message object created for {user.email}", 'info')
+            
+            msg.html = f"""
+            <html>
+            <body style="padding: 20px; font-family: Arial;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #8b5cf6;">⏰ Reminder</h1>
+                    <div style="background: #fef3c7; padding: 20px; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                        <h3>{keynote.category.replace('_', ' ').title()}</h3>
+                        <p style="font-size: 16px;">{keynote.content}</p>
+                        <p style="color: #6b7280; font-size: 12px;">Importance: {int(keynote.importance_score * 100)}%</p>
+                    </div>
                 </div>
-            </div>
-        </body>
-        </html>
-        """
-        
-        mail.send(msg)
-        reminder.is_sent = True
-        reminder.sent_at = datetime.now()
-        db.commit()
-        print(f"✅ Reminder sent for keynote {keynote.id}")
-    except Exception as e:
-        print(f"Reminder error: {e}")
-    finally:
-        db.close()
+            </body>
+            </html>
+            """
+            
+            add_log(f"⏰ [REMINDER EMAIL] HTML body built, calling mail.send()", 'info')
+            mail.send(msg)
+            
+            add_log(f"⏰ [REMINDER EMAIL] mail.send() completed, updating database", 'info')
+            reminder.is_sent = True
+            reminder.sent_at = datetime.now()
+            db.commit()
+            add_log(f"✅ [REMINDER EMAIL] SUCCESS - Reminder {reminder_id} sent to {user.email} for keynote {keynote.id}", 'success')
+            
+        except Exception as e:
+            add_log(f"❌ [REMINDER EMAIL] FAILED - Error: {str(e)}", 'error')
+            import traceback
+            add_log(f"❌ [REMINDER EMAIL] Traceback: {traceback.format_exc()}", 'error')
+        finally:
+            db.close()
+            add_log(f"⏰ [REMINDER EMAIL] Database connection closed", 'info')
 
 def run_ai_pendant_process(user_id=1):
     """Main process - runs your original + new features"""
@@ -491,44 +536,68 @@ def mark_keynote_complete(keynote_id):
 @app.route('/api/reminders', methods=['POST'])
 def create_reminder():
     """Create a reminder for a keynote"""
+    add_log(f"⏰ [CREATE REMINDER] Request received", 'info')
+    
     data = request.json
     keynote_id = data.get('keynote_id')
     reminder_time_str = data.get('reminder_time')
     user_id = data.get('user_id', 1)
     
+    add_log(f"⏰ [CREATE REMINDER] Keynote ID: {keynote_id}, User ID: {user_id}, Time: {reminder_time_str}", 'info')
+    
     if not keynote_id or not reminder_time_str:
+        add_log(f"⏰ [CREATE REMINDER] ERROR: Missing keynote_id or reminder_time", 'error')
         return jsonify({'error': 'Missing data'}), 400
     
     try:
         reminder_time = datetime.fromisoformat(reminder_time_str.replace('Z', ''))
-    except:
+        add_log(f"⏰ [CREATE REMINDER] Parsed reminder_time: {reminder_time}", 'info')
+    except Exception as e:
+        add_log(f"⏰ [CREATE REMINDER] ERROR: Invalid datetime format - {str(e)}", 'error')
         return jsonify({'error': 'Invalid datetime'}), 400
     
-    db = get_db()
-    reminder = Reminder(
-        user_id=user_id,
-        keynote_id=keynote_id,
-        reminder_time=reminder_time
-    )
-    db.add(reminder)
-    db.commit()
-    reminder_id = reminder.id
-    db.close()
-    
-    # Schedule email
-    scheduler.add_job(
-        func=send_reminder_email,
-        trigger='date',
-        run_date=reminder_time,
-        args=[reminder_id],
-        id=f"reminder_{reminder_id}"
-    )
-    
-    return jsonify({
-        'status': 'scheduled',
-        'reminder_id': reminder_id,
-        'reminder_time': reminder_time.isoformat()
-    })
+    try:
+        db = get_db()
+        add_log(f"⏰ [CREATE REMINDER] Database connection established", 'info')
+        
+        reminder = Reminder(
+            user_id=user_id,
+            keynote_id=keynote_id,
+            reminder_time=reminder_time
+        )
+        add_log(f"⏰ [CREATE REMINDER] Reminder object created", 'info')
+        
+        db.add(reminder)
+        db.commit()
+        reminder_id = reminder.id
+        db.close()
+        add_log(f"⏰ [CREATE REMINDER] Reminder saved to database with ID: {reminder_id}", 'success')
+        
+        # Schedule email
+        add_log(f"⏰ [CREATE REMINDER] Scheduling background job for {reminder_time}", 'info')
+        try:
+            scheduler.add_job(
+                func=send_reminder_email,
+                trigger='date',
+                run_date=reminder_time,
+                args=[reminder_id],
+                id=f"reminder_{reminder_id}"
+            )
+            add_log(f"✅ [CREATE REMINDER] Job scheduled successfully - ID: reminder_{reminder_id}", 'success')
+        except Exception as sched_err:
+            add_log(f"❌ [CREATE REMINDER] Scheduler error: {str(sched_err)}", 'error')
+            return jsonify({'error': f'Scheduler error: {str(sched_err)}'}), 500
+        
+        return jsonify({
+            'status': 'scheduled',
+            'reminder_id': reminder_id,
+            'reminder_time': reminder_time.isoformat()
+        })
+    except Exception as e:
+        add_log(f"❌ [CREATE REMINDER] FAILED - {str(e)}", 'error')
+        import traceback
+        add_log(f"❌ [CREATE REMINDER] Traceback: {traceback.format_exc()}", 'error')
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/reminders/<int:reminder_id>', methods=['DELETE'])
 def cancel_reminder(reminder_id):
@@ -568,6 +637,56 @@ def get_user_reminders(user_id):
     db.close()
     return jsonify(result)
 
+@app.route('/api/debug/reminders', methods=['GET'])
+def debug_reminders():
+    """Debug endpoint - show all scheduled reminder jobs and database records"""
+    add_log(f"🔍 [DEBUG REMINDERS] Request received", 'info')
+    
+    try:
+        # Get scheduler jobs
+        jobs = scheduler.get_jobs()
+        scheduled_jobs = []
+        for job in jobs:
+            if 'reminder_' in str(job.id):
+                scheduled_jobs.append({
+                    'job_id': str(job.id),
+                    'next_run_time': str(job.next_run_time),
+                    'trigger': str(job.trigger),
+                    'func': str(job.func_ref)
+                })
+        
+        add_log(f"🔍 [DEBUG REMINDERS] Found {len(scheduled_jobs)} scheduled reminder jobs", 'info')
+        
+        # Get database records
+        db = get_db()
+        all_reminders = db.query(Reminder).all()
+        db_reminders = []
+        for r in all_reminders:
+            db_reminders.append({
+                'id': r.id,
+                'user_id': r.user_id,
+                'keynote_id': r.keynote_id,
+                'reminder_time': r.reminder_time.isoformat(),
+                'is_sent': r.is_sent,
+                'sent_at': r.sent_at.isoformat() if r.sent_at else None,
+                'created_at': r.created_at.isoformat() if hasattr(r, 'created_at') else None
+            })
+        
+        db.close()
+        add_log(f"🔍 [DEBUG REMINDERS] Found {len(db_reminders)} reminders in database", 'info')
+        
+        return jsonify({
+            'status': 'ok',
+            'scheduled_jobs': scheduled_jobs,
+            'database_records': db_reminders,
+            'mail_configured': bool(app.config.get('MAIL_USERNAME')),
+            'scheduler_running': scheduler.running,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        add_log(f"❌ [DEBUG REMINDERS] Error: {str(e)}", 'error')
+        return jsonify({'error': str(e), 'timestamp': datetime.now().isoformat()}), 500
+
 @app.route('/api/chat', methods=['POST'])
 def chat_with_history():
     """RAG-based chat"""
@@ -588,11 +707,9 @@ def search_conversations():
     if not query:
         return jsonify({'error': 'Query required'}), 400
     
-    results = rag_system.semantic_search(query, top_k=10)
-    
     db = get_db()
     detailed_results = []
-    
+    results = rag_system.semantic_search(query, limit=10)
     for result in results:
         conv = db.query(Conversation).filter(
             Conversation.id == result['conversation_id']
@@ -652,6 +769,16 @@ if __name__ == '__main__':
     print("\n🌐 Server starting on: http://localhost:5000")
     print("="*70 + "\n")
     
+    # Initialize database
+    from models import Base, engine
+    Base.metadata.create_all(engine)
+    print("✅ Database initialized\n")
+    
+    # Start server
+    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
+
+
+if __name__ == '__main__':
     # Initialize database
     from models import Base, engine
     Base.metadata.create_all(engine)
