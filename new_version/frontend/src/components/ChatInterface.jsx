@@ -46,18 +46,18 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Chat with Your Memory</h1>
-          <p className="text-purple-200">Ask me anything about your past conversations</p>
+          <p className="text-white/70">Ask me anything about your past conversations</p>
         </div>
 
         {/* Chat Messages */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6 h-[500px] overflow-y-auto">
+        <div className="bg-slate-900 rounded-2xl p-6 border border-white mb-6 h-[500px] overflow-y-auto">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <MessageSquare className="w-16 h-16 mb-4 opacity-30" />
+            <div className="flex flex-col items-center justify-center h-full text-white/50">
+              <MessageSquare className="w-16 h-16 mb-4" />
               <p className="text-center">Start a conversation about your recorded meetings</p>
               <p className="text-sm text-center mt-2">Try asking: "What did we discuss about the project deadline?"</p>
             </div>
@@ -66,24 +66,24 @@ const ChatInterface = () => {
               {messages.map((message, idx) => (
                 <div key={idx} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-xl p-4 ${
-                    message.type === 'user' ? 'bg-purple-500 text-white' :
-                    message.type === 'error' ? 'bg-red-500/20 text-red-300' :
-                    'bg-white/10 text-white'
+                    message.type === 'user' ? 'bg-blue-900 text-white border border-white' :
+                    message.type === 'error' ? 'bg-slate-800 text-white border border-white' :
+                    'bg-slate-800 text-white border border-white'
                   }`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     
                     {message.sources && message.sources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-white/20">
-                        <p className="text-xs text-gray-300 mb-2">Sources:</p>
+                      <div className="mt-3 pt-3 border-t border-white">
+                        <p className="text-xs text-white mb-2">Sources:</p>
                         {message.sources.map((source, sourceIdx) => (
                           <Link
                             key={sourceIdx}
                             to={`/conversation/${source.id}`}
-                            className="block text-xs bg-white/10 rounded px-2 py-1 mb-1 hover:bg-white/20"
+                            className="block text-xs bg-slate-700 rounded px-2 py-1 mb-1 hover:bg-slate-600 border border-white"
                           >
                             <FileText className="w-3 h-3 inline mr-1" />
                             {source.title} ({source.date})
-                            <span className="ml-2 text-gray-400">
+                            <span className="ml-2 text-white/70">
                               {(source.similarity * 100).toFixed(0)}% match
                             </span>
                           </Link>
@@ -91,7 +91,7 @@ const ChatInterface = () => {
                       </div>
                     )}
                     
-                    <p className="text-xs text-gray-300 mt-2">
+                    <p className="text-xs text-white/60 mt-2">
                       {message.timestamp.toLocaleTimeString()}
                     </p>
                   </div>
@@ -100,7 +100,7 @@ const ChatInterface = () => {
               
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white/10 rounded-xl p-4">
+                  <div className="bg-slate-800 rounded-xl p-4 border border-white">
                     <div className="flex gap-2">
                       <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -121,13 +121,13 @@ const ChatInterface = () => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask about your conversations..."
-            className="flex-1 px-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="flex-1 px-4 py-4 rounded-xl bg-slate-800 border border-white text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white"
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
             disabled={isLoading || !inputValue.trim()}
-            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-4 rounded-xl font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-900 hover:bg-blue-800 text-white px-6 py-4 rounded-xl font-semibold flex items-center gap-2 border border-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-5 h-5" />
             Send

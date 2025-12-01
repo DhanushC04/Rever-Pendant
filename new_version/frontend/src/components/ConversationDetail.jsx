@@ -89,7 +89,7 @@ const ConversationDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -97,20 +97,20 @@ const ConversationDetail = () => {
 
   if (!conversation) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Conversation not found</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link 
             to="/history" 
-            className="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 mb-4"
+            className="inline-flex items-center gap-2 text-white hover:text-white/70 mb-4 border border-white rounded px-3 py-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to History
@@ -150,8 +150,8 @@ const ConversationDetail = () => {
               onClick={() => setActiveTab(tab)}
               className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                 activeTab === tab
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                  ? 'bg-blue-900 text-white border border-white'
+                  : 'bg-slate-800 text-white/70 hover:bg-slate-700 border border-white/30'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -160,7 +160,7 @@ const ConversationDetail = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+        <div className="bg-slate-900 rounded-2xl p-8 border border-white">
           {activeTab === 'keynotes' && (
             <div>
               <h2 className="text-2xl font-bold text-white mb-4">Key Takeaways</h2>
@@ -172,34 +172,24 @@ const ConversationDetail = () => {
                     return (
                       <div 
                         key={keynote.id} 
-                        className={`bg-white/5 rounded-xl p-4 border-l-4 ${
-                          keynote.category === 'action_item' ? 'border-red-500' :
-                          keynote.category === 'decision' ? 'border-green-500' :
-                          keynote.category === 'question' ? 'border-yellow-500' :
-                          keynote.category === 'deadline' ? 'border-red-600' :
-                          'border-blue-500'
+                        className={`bg-slate-800 rounded-xl p-4 border-l-4 border-white ${
+                          keynote.is_completed ? 'opacity-60' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <span className={`inline-block text-xs px-2 py-1 rounded mb-2 ${
-                              keynote.category === 'action_item' ? 'bg-red-500/20 text-red-300' :
-                              keynote.category === 'decision' ? 'bg-green-500/20 text-green-300' :
-                              keynote.category === 'question' ? 'bg-yellow-500/20 text-yellow-300' :
-                              keynote.category === 'deadline' ? 'bg-red-600/20 text-red-300' :
-                              'bg-blue-500/20 text-blue-300'
-                            }`}>
+                            <span className={`inline-block text-xs px-2 py-1 rounded mb-2 bg-blue-900 text-white border border-white`}>
                               {keynote.category.replace('_', ' ').toUpperCase()}
                             </span>
                             <p className={`text-white/90 ${keynote.is_completed ? 'line-through opacity-50' : ''}`}>
                               {keynote.content}
                             </p>
                             <div className="flex items-center gap-4 mt-2">
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-white/70">
                                 Importance: {(keynote.importance_score * 100).toFixed(0)}%
                               </span>
                               {hasReminder && (
-                                <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded flex items-center gap-1">
+                                <span className="text-xs bg-blue-900 text-white px-2 py-1 rounded flex items-center gap-1 border border-white">
                                   <Bell className="w-3 h-3" />
                                   Reminder Set
                                 </span>
@@ -211,8 +201,8 @@ const ConversationDetail = () => {
                               onClick={() => handleCompleteKeynote(keynote.id)}
                               className={`p-2 transition-colors ${
                                 keynote.is_completed 
-                                  ? 'text-gray-400' 
-                                  : 'text-green-400 hover:text-green-300'
+                                  ? 'text-white/30' 
+                                  : 'text-white hover:text-white/70 border border-white rounded'
                               }`}
                               title={keynote.is_completed ? 'Mark as incomplete' : 'Mark as complete'}
                             >
@@ -220,7 +210,7 @@ const ConversationDetail = () => {
                             </button>
                             <button
                               onClick={() => openReminderModal(keynote)}
-                              className="p-2 text-yellow-400 hover:text-yellow-300"
+                              className="p-2 text-white hover:text-white/70 border border-white rounded"
                               title="Set reminder"
                             >
                               {hasReminder ? <BellOff className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
@@ -232,7 +222,7 @@ const ConversationDetail = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-400">No keynotes extracted</p>
+                <p className="text-white/50">No keynotes extracted</p>
               )}
             </div>
           )}

@@ -7,32 +7,32 @@ const StageCard = ({ stage, isActive, progress, result, stageNumber }) => {
     1: {
       icon: Camera,
       title: 'Face Recognition',
-      color: 'purple',
+      color: 'blue',
       activeLabel: 'Scanning faces...',
-      activeClasses: 'bg-purple-500/30 border-purple-400',
-      iconActiveClasses: 'text-purple-300 animate-pulse',
-      progressClasses: 'from-purple-400 to-pink-400',
-      textClasses: 'text-purple-200'
+      activeClasses: 'bg-blue-900 border-white',
+      iconActiveClasses: 'text-white animate-pulse',
+      progressClasses: 'bg-white',
+      textClasses: 'text-white'
     },
     2: {
       icon: Mic,
       title: 'Audio Capture',
       color: 'blue',
       activeLabel: 'Recording audio...',
-      activeClasses: 'bg-blue-500/30 border-blue-400',
-      iconActiveClasses: 'text-blue-300 animate-pulse',
-      progressClasses: 'from-blue-400 to-cyan-400',
-      textClasses: 'text-blue-200'
+      activeClasses: 'bg-blue-900 border-white',
+      iconActiveClasses: 'text-white animate-pulse',
+      progressClasses: 'bg-white',
+      textClasses: 'text-white'
     },
     3: {
       icon: FileText,
       title: 'AI Summary',
-      color: 'pink',
+      color: 'blue',
       activeLabel: 'Generating...',
-      activeClasses: 'bg-pink-500/30 border-pink-400',
-      iconActiveClasses: 'text-pink-300 animate-pulse',
-      progressClasses: 'from-pink-400 to-rose-400',
-      textClasses: 'text-pink-200'
+      activeClasses: 'bg-blue-900 border-white',
+      iconActiveClasses: 'text-white animate-pulse',
+      progressClasses: 'bg-white',
+      textClasses: 'text-white'
     }
   };
 
@@ -44,21 +44,21 @@ const StageCard = ({ stage, isActive, progress, result, stageNumber }) => {
       return `p-6 rounded-xl border-2 ${config.activeClasses} scale-105 transition-all duration-300 shadow-xl`;
     }
     if (result && stageNumber === 1) {
-      return 'p-6 rounded-xl border-2 bg-green-500/20 border-green-400/50 transition-all duration-300';
+      return 'p-6 rounded-xl border-2 bg-blue-900 border-white transition-all duration-300';
     }
     if ((stage === 'audio' || stage === 'summary' || stage === 'complete') && stageNumber < (stage === 'audio' ? 2 : stage === 'summary' ? 3 : 4)) {
-      return 'p-6 rounded-xl border-2 bg-green-500/20 border-green-400/50 transition-all duration-300';
+      return 'p-6 rounded-xl border-2 bg-blue-900 border-white transition-all duration-300';
     }
-    return 'p-6 rounded-xl border-2 bg-white/5 border-white/10 transition-all duration-300';
+    return 'p-6 rounded-xl border-2 bg-slate-900 border-white/30 transition-all duration-300';
   };
 
   const getIconClass = () => {
     if (isActive) return `w-8 h-8 ${config.iconActiveClasses}`;
-    if (result && stageNumber === 1) return 'w-8 h-8 text-green-400';
+    if (result && stageNumber === 1) return 'w-8 h-8 text-white';
     if ((stage === 'audio' || stage === 'summary' || stage === 'complete') && stageNumber < (stage === 'audio' ? 2 : stage === 'summary' ? 3 : 4)) {
-      return 'w-8 h-8 text-green-400';
+      return 'w-8 h-8 text-white';
     }
-    return 'w-8 h-8 text-gray-400';
+    return 'w-8 h-8 text-white/50';
   };
 
   const shouldShowComplete = () => {

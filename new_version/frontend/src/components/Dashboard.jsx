@@ -112,19 +112,19 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-5xl font-bold text-white mb-3 flex items-center justify-center gap-3">
-            <Activity className="w-12 h-12 text-purple-400 animate-pulse-ring" />
+            <Activity className="w-12 h-12 text-white animate-pulse-ring" />
             AI Pendant System
           </h1>
-          <p className="text-purple-200 text-lg">
+          <p className="text-white/70 text-lg">
             Real-time Face Recognition • Audio Transcription • AI Summarization
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full border border-white/20">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 animate-pulse-ring' : 'bg-red-400'}`}></div>
+          <div className="mt-4 inline-flex items-center gap-2 bg-slate-800 backdrop-blur px-4 py-2 rounded-full border border-white">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-white animate-pulse-ring' : 'bg-white/30'}`}></div>
             <span className="text-white text-sm">
               {isConnected ? 'Backend Connected' : 'Backend Offline'}
             </span>
@@ -133,7 +133,7 @@ const Dashboard = () => {
 
         {/* Error Display */}
         {state.error && (
-          <div className="bg-red-500/20 border border-red-400 rounded-xl p-4 mb-6 text-red-300 flex items-center gap-3 animate-fade-in">
+          <div className="bg-slate-800 border border-white rounded-xl p-4 mb-6 text-white flex items-center gap-3 animate-fade-in">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <div>
               <strong>Error:</strong> {state.error}
@@ -142,14 +142,14 @@ const Dashboard = () => {
         )}
 
         {/* Main Control Panel */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20 shadow-2xl">
+        <div className="bg-slate-900 rounded-2xl p-8 mb-6 border border-white shadow-2xl">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <h2 className="text-2xl font-bold text-white">Control Panel</h2>
               {state.is_processing && state.stage !== 'complete' && (
-                <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-400 px-4 py-2 rounded-lg">
-                  <Loader2 className="w-4 h-4 text-yellow-300 animate-spin" />
-                  <span className="text-yellow-300 text-sm font-medium">Processing...</span>
+                <div className="flex items-center gap-2 bg-blue-900 border border-white px-4 py-2 rounded-lg">
+                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                  <span className="text-white text-sm font-medium">Processing...</span>
                 </div>
               )}
             </div>
@@ -159,7 +159,7 @@ const Dashboard = () => {
                 <button
                   onClick={handleStart}
                   disabled={!isConnected || isLoading}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg border border-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isLoading ? (
                     <>
@@ -179,14 +179,14 @@ const Dashboard = () => {
                 <>
                   <button
                     onClick={handleDownload}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg hover:scale-105"
+                    className="bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg hover:scale-105 border border-white"
                   >
                     <Download className="w-5 h-5" />
                     Download
                   </button>
                   <button
                     onClick={handleReset}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg hover:scale-105"
+                    className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-lg hover:scale-105 border border-white"
                   >
                     <RefreshCw className="w-5 h-5" />
                     Reset

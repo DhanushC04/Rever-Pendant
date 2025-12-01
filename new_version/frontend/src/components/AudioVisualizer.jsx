@@ -18,11 +18,11 @@ const AudioVisualizer = ({ isActive }) => {
   if (!isActive) return null;
 
   return (
-    <div className="flex gap-1 items-end h-20 mb-3 bg-black/20 rounded-lg p-2">
+    <div className="flex gap-1 items-end h-20 mb-3 bg-slate-950 rounded-lg p-2">
       {bars.map((height, i) => (
         <div
           key={i}
-          className="flex-1 bg-gradient-to-t from-blue-400 to-cyan-400 rounded-t transition-all duration-100"
+          className="flex-1 bg-white rounded-t transition-all duration-100"
           style={{ height: `${height}%` }}
         />
       ))}
