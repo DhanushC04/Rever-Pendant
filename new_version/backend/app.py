@@ -687,6 +687,67 @@ def debug_reminders():
         add_log(f"❌ [DEBUG REMINDERS] Error: {str(e)}", 'error')
         return jsonify({'error': str(e), 'timestamp': datetime.now().isoformat()}), 500
 
+@app.route('/api/debug/test-email', methods=['POST'])
+def test_email():
+    """Test email sending functionality"""
+    add_log(f"📧 [TEST EMAIL] Request received", 'info')
+    
+    data = request.json or {}
+    test_email_addr = data.get('email', 'test@example.com')
+    
+    # Check if credentials are configured
+    mail_username = app.config.get('MAIL_USERNAME', '')
+    mail_password = app.config.get('MAIL_PASSWORD', '')
+    
+    if not mail_username or not mail_password:
+        add_log(f"❌ [TEST EMAIL] Email credentials not configured in .env file", 'error')
+        return jsonify({
+            'error': 'Email credentials not configured',
+            'message': 'Please set EMAIL_USERNAME and EMAIL_PASSWORD in .env file',
+            'mail_username_set': bool(mail_username),
+            'mail_password_set': bool(mail_password)
+        }), 500
+    
+    try:
+        with app.app_context():
+            msg = Message(
+                subject='🧪 AI Pendant - Test Email',
+                recipients=[test_email_addr],
+                html="""
+                <html>
+                <body style="padding: 20px; font-family: Arial;">
+                    <div style="max-width: 600px; margin: 0 auto;">
+                        <h1 style="color: #8b5cf6;">🧪 Email Configuration Test</h1>
+                        <div style="background: #d1fae5; padding: 20px; border-left: 4px solid #10b981; border-radius: 8px;">
+                            <h3 style="color: #065f46;">✅ Email System Working</h3>
+                            <p>Your email configuration is correctly set up!</p>
+                            <p><strong>Test Time:</strong> """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+                            <p style="color: #6b7280; font-size: 12px;">AI Pendant System</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+            )
+            mail.send(msg)
+            add_log(f"✅ [TEST EMAIL] Successfully sent test email to {test_email_addr}", 'success')
+            return jsonify({
+                'status': 'success',
+                'message': f'Test email sent to {test_email_addr}',
+                'mail_server': app.config.get('MAIL_SERVER'),
+                'mail_port': app.config.get('MAIL_PORT'),
+                'mail_username': app.config.get('MAIL_USERNAME')
+            })
+    except Exception as e:
+        add_log(f"❌ [TEST EMAIL] FAILED - {str(e)}", 'error')
+        import traceback
+        add_log(f"❌ [TEST EMAIL] Traceback: {traceback.format_exc()}", 'error')
+        return jsonify({
+            'error': 'Email sending failed',
+            'message': str(e),
+            'details': traceback.format_exc()
+        }), 500
+
 @app.route('/api/chat', methods=['POST'])
 def chat_with_history():
     """RAG-based chat"""
